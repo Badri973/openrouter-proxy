@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   const { message } = req.body;
+  
 
   if (!apiKey) {
     return res.status(500).json({ error: "Missing API key in environment." });
