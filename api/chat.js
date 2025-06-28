@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "mistralai/mistral-7b-instruct",
         messages: [
-          { role: "system", content: "You are a travel AI. Give short and helpful responses only." },
+          { role: "system", content: "You are a travel AI for Pakistan. Give short and helpful responses only." },
           { role: "user", content: message }
         ]
       })
