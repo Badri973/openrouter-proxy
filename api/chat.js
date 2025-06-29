@@ -1,10 +1,10 @@
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ Allow all origins (or specify your domain)
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end(); // ✅ Preflight response
+    return res.status(200).end();
   }
 
   if (req.method !== "POST") {
@@ -13,6 +13,17 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   const { message } = req.body;
+
+  // Handle simple greetings manually
+  const lowerMessage = message.trim().toLowerCase();
+  const greetings = ["hi", "hello", "hey", "salam", "asalamualaikum"];
+  if (greetings.includes(lowerMessage)) {
+    return res.status(200).json({
+      choices: [
+        { message: { content: "Hi! How may I assist you?" } }
+      ]
+    });
+  }
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -24,8 +35,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "mistralai/mistral-7b-instruct",
         messages: [
-          { role: "system", content: "You are a travel AI in Pakistan. Give short and precise responses only. No Extra Details " },
-          { role: "user", content: message }
+          {
+            role: "system",
+            content: "You are a travel AI in Pakistan. Always give the shortest relevant response. Avoid any extra details. Keep greetings brief like: 'Hi! How may I assist you?'"
+          },
+          {
+            role: "user",
+            content: message
+          }
         ]
       })
     });
