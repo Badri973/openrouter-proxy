@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -14,15 +13,6 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   const { message } = req.body;
-
-  if (!apiKey) {
-    console.error("❌ Missing OPENROUTER_API_KEY");
-    return res.status(500).json({ error: "Server misconfiguration" });
-  }
-
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "Invalid message" });
-  }
 
   // Handle simple greetings manually
   const lowerMessage = message.trim().toLowerCase();
@@ -39,7 +29,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": Bearer ${apiKey},
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -58,20 +48,9 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-
-    // ✅ Debug log to Vercel logs
-    console.log("✅ OpenRouter response:", JSON.stringify(data, null, 2));
-
-    // Return fallback if response is malformed
-    if (!data.choices || !data.choices[0]) {
-      return res.status(200).json({
-        choices: [{ message: { content: "⚠️ AI did not respond properly." } }]
-      });
-    }
-
     return res.status(200).json(data);
   } catch (err) {
-    console.error("❌ AI Proxy Error:", err);
+    console.error("AI Proxy Error:", err);
     return res.status(500).json({ error: "AI request failed." });
   }
 }
